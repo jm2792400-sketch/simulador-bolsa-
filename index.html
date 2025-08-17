@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Bolsa</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .stock {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:disabled {
+            background-color: #aaa;
+            cursor: not-allowed;
+        }
+        #cartera {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e9ecef;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Simulador de Bolsa</h1>
+    <div class="container">
+        <p><strong>Saldo disponible:</strong> $<span id="saldo">10000</span></p>
+        
+        <div class="stock">
+            <span>Acción A: $<span id="precioA">100</span></span>
+            <button onclick="comprar('A')">Comprar</button>
+        </div>
+        <div class="stock">
+            <span>Acción B: $<span id="precioB">150</span></span>
+            <button onclick="comprar('B')">Comprar</button>
+        </div>
+        <div class="stock">
+            <span>Acción C: $<span id="precioC">200</span></span>
+            <button onclick="comprar('C')">Comprar</button>
+        </div>
+
+        <div id="cartera">
+            <h3>Cartera:</h3>
+            <ul id="lista"></ul>
+        </div>
+    </div>
+
+    <script>
+        let saldo = 10000;
+        let precios = { A: 100, B: 150, C: 200 };
+        let cartera = [];
+
+        function comprar(accion) {
+            let precio = precios[accion];
+            if (saldo >= precio) {
+                saldo -= precio;
+                cartera.push(accion);
+                document.getElementById('saldo').textContent = saldo;
+                actualizarCartera();
+            } else {
+                alert('No tienes saldo suficiente para comprar esta acción.');
+            }
+        }
+
+        function actualizarCartera() {
+            let lista = document.getElementById('lista');
+            lista.innerHTML = '';
+            cartera.forEach(item => {
+                let li = document.createElement('li');
+                li.textContent = `Acción ${item}`;
+                lista.appendChild(li);
+            });
+        }
+
+        // Simular cambio de precios cada 5 segundos
+        setInterval(() => {
+            for (let key in precios) {
+                precios[key] = Math.max(50, precios[key] + Math.floor(Math.random() * 21 - 10));
+                document.getElementById('precio' + key).textContent = precios[key];
+            }
+        }, 5000);
+    </script>
+</body>
+</html>
