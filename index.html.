@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Bolsa Avanzado</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f7fa;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background: #1e293b;
+            color: #fff;
+            padding: 15px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        main {
+            max-width: 1100px;
+            margin: 30px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #1e293b;
+        }
+        .saldo {
+            text-align: center;
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #1e293b;
+            color: white;
+        }
+        tr:hover {
+            background-color: #f1f5f9;
+        }
+        .btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .buy {
+            background: #16a34a;
+            color: white;
+        }
+        .sell {
+            background: #dc2626;
+            color: white;
+        }
+        .btn:hover {
+            opacity: 0.8;
+        }
+        #historial {
+            max-height: 250px;
+            overflow-y: auto;
+            background: #f9fafb;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 6px;
+        }
+        #grafico {
+            width: 100%;
+            height: 300px;
+            background: #f1f5f9;
+            border-radius: 6px;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>📊 Simulador de Bolsa Avanzado</header>
+    <main>
+        <h2>Mercado de Acciones</h2>
+        <div class="saldo">💰 Saldo: <span id="saldo">10000</span> USD</div>
+        
+        <div class="grid">
+            <div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Empresa</th>
+                            <th>Precio</th>
+                            <th>Acciones</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla"></tbody>
+                </table>
+
+                <h3>📜 Historial de Transacciones</h3>
+                <div id="historial"></div>
+            </div>
+
+            <div>
+                <h3>📈 Gráfico de Precios</h3>
+                <canvas id="grafico" width="400" height="300"></canvas>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let saldo = 10000;
+        const empresas = [
+            { nombre: "TechCorp", precio: 150, cantidad: 0, historial: [] },
+            { nombre: "GreenEnergy", precio: 80, cantidad: 0, historial: [] },
+            { nombre: "HealthPlus", precio: 120, cantidad: 0, historial: [] },
+            { nombre: "AutoDrive", precio: 200, cantidad: 0, historial: [] }
+        ];
+        const historialGeneral = [];
+        const colores = ["#16a34a", "#2563eb", "#f59e0b", "#dc2626"];
+        const ctx = document.getElementById('grafico').getContext('2d');
+
+        function actualizarTabla() {
+            const tabla = document.getElementById("tabla");
+            tabla.innerHTML = "";
+            empresas.forEach((empresa, index) => {
+                const fila = document.createElement("tr");
+                fila.innerHTML = `
+                    <td>${empresa.nombre}</td>
+                    <td>$${empresa.precio.toFixed(2)}</td>
+                    <td>${empresa.cantidad}</td>
+                    <td>
+                        <button class="btn buy" onclick="comprar(${index})">Comprar</button>
+                        <button class="btn sell" onclick="vender(${index})">Vender</button>
+                    </td>
+                `;
+                tabla.appendChild(fila);
+            });
+            document.getElementById("saldo").textContent = saldo.toFixed(2);
+        }
+
+        function agregarHistorial(accion, empresa, precio) {
+            const texto = `${accion} ${empresa} a $${precio.toFixed(2)}`;
+            historialGeneral.unshift(texto);
+            const divHistorial = document.getElementById("historial");
+            divHistorial.innerHTML = historialGeneral.map(item => `<p>${item}</p>`).join("");
+        }
+
+        function comprar(i) {
+            if (saldo >= empresas[i].precio) {
+                saldo -= empresas[i].precio;
+                empresas[i].cantidad++;
+                agregarHistorial("Compraste", empresas[i].nombre, empresas[i].precio);
+                actualizarTabla();
+            } else {
+                alert("Saldo insuficiente para comprar esta acción.");
+            }
+        }
+
+        function vender(i) {
+            if (empresas[i].cantidad > 0) {
+                saldo += empresas[i].precio;
+                empresas[i].cantidad--;
+                agregarHistorial("Vendiste", empresas[i].nombre, empresas[i].precio);
+                actualizarTabla();
+            } else {
+                alert("No tienes acciones de esta empresa para vender.");
+            }
+        }
+
+        function cambiarPrecios() {
+            empresas.forEach(emp => {
+                const variacion = (Math.random() * 10 - 5);
+                emp.precio = Math.max(10, emp.precio + variacion);
+                emp.historial.push(emp.precio);
+                if (emp.historial.length > 50) emp.historial.shift();
+            });
+            actualizarTabla();
+            dibujarGrafico();
+        }
+
+        function dibujarGrafico() {
+            ctx.clearRect(0, 0, 400, 300);
+            empresas.forEach((emp, index) => {
+                ctx.beginPath();
+                ctx.strokeStyle = colores[index];
+                ctx.moveTo(0, 300 - emp.historial[0]);
+                emp.historial.forEach((precio, i) => {
+                    ctx.lineTo(i * 8, 300 - precio);
+                });
+                ctx.stroke();
+            });
+        }
+
+        setInterval(cambiarPrecios, 5000);
+        actualizarTabla();
+    </script>
+</body>
+</html>
