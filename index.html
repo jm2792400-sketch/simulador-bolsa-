@@ -3,131 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Bolsa Pro</title>
+    <title>Simulador de Bolsa - Modo Competitivo</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f5f7fa;
-            margin: 0;
-            padding: 0;
+        body { font-family: Arial, sans-serif; background: #f5f7fa; margin: 0; padding: 0; }
+        header { background: #1e293b; color: #fff; padding: 15px; text-align: center; font-size: 24px; font-weight: bold; }
+        main { max-width: 1200px; margin: 30px auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h2, h3 { color: #1e293b; margin-bottom: 15px; }
+        .saldo, .valor-total { text-align: center; font-size: 20px; margin-bottom: 10px; }
+        .valor-total span { font-weight: bold; color: #2563eb; }
+        .grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { padding: 12px; text-align: center; border-bottom: 1px solid #ddd; }
+        th { background-color: #1e293b; color: white; }
+        tr:hover { background-color: #f1f5f9; }
+        .btn { padding: 8px 12px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin: 4px; }
+        .buy { background: #16a34a; color: white; }
+        .sell { background: #dc2626; color: white; }
+        .action-btn { background: #2563eb; color: white; margin-top: 10px; }
+        .btn:hover { opacity: 0.8; }
+        #historial { max-height: 250px; overflow-y: auto; background: #f9fafb; border: 1px solid #ccc; padding: 10px; border-radius: 6px; }
+        #grafico { width: 100%; height: 300px; background: #f1f5f9; border-radius: 6px; padding: 10px; }
+        .ranking { margin-top: 20px; background: #f9fafb; padding: 10px; border-radius: 6px; border: 1px solid #ccc; }
+        .ranking p { margin: 5px 0; }
+        .acciones-extra { text-align: center; margin-top: 15px; }
+        .nota { font-size: 14px; color: #555; text-align: center; margin-top: 5px; }
+
+        /* Modal (tutorial + nombre) */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
         }
-        header {
-            background: #1e293b;
-            color: #fff;
-            padding: 15px;
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-        }
-        main {
-            max-width: 1200px;
-            margin: 30px auto;
+        .modal-content {
             background: #fff;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        h2, h3 {
-            color: #1e293b;
-            margin-bottom: 15px;
-        }
-        .saldo, .valor-total {
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
             text-align: center;
-            font-size: 20px;
-            margin-bottom: 10px;
+            animation: aparecer 0.4s ease;
         }
-        .valor-total span {
-            font-weight: bold;
-            color: #2563eb;
+        @keyframes aparecer {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
         }
-        .grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        th, td {
-            padding: 12px;
-            text-align: center;
-            border-bottom: 1px solid #ddd;
-        }
-        th {
-            background-color: #1e293b;
-            color: white;
-        }
-        tr:hover {
-            background-color: #f1f5f9;
-        }
-        .btn {
-            padding: 8px 12px;
+        .modal-content h2 { margin-bottom: 15px; color: #2563eb; }
+        .modal-content p { margin: 10px 0; font-size: 16px; }
+        .close-btn {
+            background: #2563eb;
+            color: #fff;
+            padding: 10px 15px;
             border: none;
             border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            margin: 4px;
-        }
-        .buy {
-            background: #16a34a;
-            color: white;
-        }
-        .sell {
-            background: #dc2626;
-            color: white;
-        }
-        .action-btn {
-            background: #2563eb;
-            color: white;
-            margin-top: 10px;
-        }
-        .btn:hover {
-            opacity: 0.8;
-        }
-        #historial {
-            max-height: 250px;
-            overflow-y: auto;
-            background: #f9fafb;
-            border: 1px solid #ccc;
-            padding: 10px;
-            border-radius: 6px;
-        }
-        #grafico {
-            width: 100%;
-            height: 300px;
-            background: #f1f5f9;
-            border-radius: 6px;
-            padding: 10px;
-        }
-        .ranking {
-            margin-top: 20px;
-            background: #f9fafb;
-            padding: 10px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-        }
-        .ranking p {
-            margin: 5px 0;
-        }
-        .acciones-extra {
-            text-align: center;
+            font-size: 16px;
             margin-top: 15px;
+            cursor: pointer;
+        }
+        .tutorial-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #f59e0b;
+            color: #fff;
+            padding: 12px;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        /* Ranking Global */
+        .ranking-global {
+            background: #fff4e6;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border: 2px solid #f59e0b;
+        }
+        .ranking-global h3 {
+            color: #d97706;
         }
     </style>
 </head>
 <body>
-    <header>📊 Simulador de Bolsa Pro</header>
+    <header>📊 Simulador de Bolsa - Modo Competitivo</header>
     <main>
         <h2>Mercado de Acciones</h2>
         <div class="saldo">💰 Saldo: <span id="saldo">10000</span> USD</div>
         <div class="valor-total">Valor total de la cartera: <span id="valor-total">10000</span> USD</div>
         
         <div class="acciones-extra">
+            <button class="btn action-btn" onclick="guardarPuntaje()">💾 Guardar Puntaje</button>
             <button class="btn action-btn" onclick="reiniciar()">🔄 Reiniciar Partida</button>
-            <button class="btn action-btn" onclick="exportarHistorial()">📥 Exportar Historial</button>
+            <button class="btn action-btn" onclick="exportarHistorialTXT()">📥 Exportar TXT</button>
+            <button class="btn action-btn" onclick="exportarHistorialCSV()">📊 Exportar CSV</button>
         </div>
+        <div class="nota">* Cada transacción tiene una comisión del 1 %</div>
 
         <div class="grid">
             <div>
@@ -152,16 +129,38 @@
                 <canvas id="grafico" width="400" height="300"></canvas>
 
                 <div class="ranking">
-                    <h3>🏆 Ranking de Ganancias/Pérdidas</h3>
+                    <h3>🏆 Ranking de Rendimiento</h3>
                     <div id="ranking"></div>
                 </div>
             </div>
         </div>
+
+        <div class="ranking-global">
+            <h3>🌍 Ranking Global (Jugadores)</h3>
+            <div id="rankingGlobal"></div>
+        </div>
     </main>
+
+    <!-- Modal del tutorial y nombre -->
+    <div class="modal" id="tutorialModal">
+        <div class="modal-content">
+            <h2>Bienvenido al Simulador</h2>
+            <p>✅ Ingresa tu nombre para competir en el ranking global.</p>
+            <input type="text" id="nombreJugador" placeholder="Escribe tu nombre" style="padding:8px; width:80%; margin:10px 0;">
+            <p>✅ Usa los botones <b>Comprar</b> y <b>Vender</b> para invertir en las empresas.</p>
+            <p>✅ Observa cómo cambian los precios cada 5 segundos.</p>
+            <p>✅ Exporta tu historial si deseas analizarlo.</p>
+            <button class="close-btn" onclick="iniciarJuego()">Empezar</button>
+        </div>
+    </div>
+
+    <button class="tutorial-btn" onclick="mostrarTutorial()" title="Ver tutorial">❔</button>
 
     <script>
         let saldo = 10000;
         const saldoInicial = 10000;
+        const comision = 0.01;
+        let nombreJugador = "";
         const empresas = [
             { nombre: "TechCorp", precio: 150, cantidad: 0, historial: [], precioInicial: 150 },
             { nombre: "GreenEnergy", precio: 80, cantidad: 0, historial: [], precioInicial: 80 },
@@ -193,18 +192,20 @@
             actualizarRanking();
         }
 
-        function agregarHistorial(accion, empresa, precio) {
-            const texto = `${accion} ${empresa} a $${precio.toFixed(2)}`;
+        function agregarHistorial(accion, empresa, precio, costoComision) {
+            const texto = `${accion},${empresa},${precio.toFixed(2)},${costoComision.toFixed(2)}`;
             historialGeneral.unshift(texto);
             const divHistorial = document.getElementById("historial");
-            divHistorial.innerHTML = historialGeneral.map(item => `<p>${item}</p>`).join("");
+            divHistorial.innerHTML = historialGeneral.map(item => `<p>${item.replace(/,/g, " | ")}</p>`).join("");
         }
 
         function comprar(i) {
-            if (saldo >= empresas[i].precio) {
-                saldo -= empresas[i].precio;
+            const costo = empresas[i].precio;
+            const costoComision = costo * comision;
+            if (saldo >= (costo + costoComision)) {
+                saldo -= (costo + costoComision);
                 empresas[i].cantidad++;
-                agregarHistorial("Compraste", empresas[i].nombre, empresas[i].precio);
+                agregarHistorial("Compra", empresas[i].nombre, empresas[i].precio, costoComision);
                 actualizarTabla();
             } else {
                 alert("Saldo insuficiente para comprar esta acción.");
@@ -213,12 +214,14 @@
 
         function vender(i) {
             if (empresas[i].cantidad > 0) {
-                saldo += empresas[i].precio;
+                const ganancia = empresas[i].precio;
+                const costoComision = ganancia * comision;
+                saldo += (ganancia - costoComision);
                 empresas[i].cantidad--;
-                agregarHistorial("Vendiste", empresas[i].nombre, empresas[i].precio);
+                agregarHistorial("Venta", empresas[i].nombre, empresas[i].precio, costoComision);
                 actualizarTabla();
             } else {
-                alert("No tienes acciones de esta empresa para vender.");
+                alert("No tienes acciones para vender.");
             }
         }
 
@@ -244,10 +247,11 @@
                 const valorActual = emp.precio * emp.cantidad;
                 const valorInicial = emp.precioInicial * emp.cantidad;
                 const ganancia = valorActual - valorInicial;
-                return { nombre: emp.nombre, ganancia: ganancia };
+                const porcentaje = emp.cantidad > 0 ? (ganancia / valorInicial) * 100 : 0;
+                return { nombre: emp.nombre, ganancia: ganancia, porcentaje: porcentaje };
             }).sort((a, b) => b.ganancia - a.ganancia);
             
-            rankingDiv.innerHTML = ranking.map(r => `<p>${r.nombre}: ${r.ganancia.toFixed(2)} USD</p>`).join("");
+            rankingDiv.innerHTML = ranking.map(r => `<p>${r.nombre}: ${r.ganancia.toFixed(2)} USD (${r.porcentaje.toFixed(2)}%)</p>`).join("");
         }
 
         function dibujarGrafico() {
@@ -276,7 +280,7 @@
             ctx.clearRect(0, 0, 400, 300);
         }
 
-        function exportarHistorial() {
+        function exportarHistorialTXT() {
             if (historialGeneral.length === 0) {
                 alert("No hay historial para exportar.");
                 return;
@@ -289,9 +293,64 @@
             enlace.click();
         }
 
+        function exportarHistorialCSV() {
+            if (historialGeneral.length === 0) {
+                alert("No hay historial para exportar.");
+                return;
+            }
+            const encabezado = "Acción,Empresa,Precio,Comisión\n";
+            const contenido = encabezado + historialGeneral.join("\n");
+            const blob = new Blob([contenido], { type: "text/csv" });
+            const enlace = document.createElement("a");
+            enlace.href = URL.createObjectURL(blob);
+            enlace.download = "historial_transacciones.csv";
+            enlace.click();
+        }
+
+        // Ranking Global en localStorage
+        function guardarPuntaje() {
+            if (!nombreJugador) {
+                alert("Debes ingresar tu nombre antes de jugar.");
+                mostrarTutorial();
+                return;
+            }
+            const valorTotal = parseFloat(document.getElementById("valor-total").textContent);
+            let rankingGlobal = JSON.parse(localStorage.getItem("rankingGlobal")) || [];
+            rankingGlobal.push({ nombre: nombreJugador, puntaje: valorTotal });
+            rankingGlobal.sort((a, b) => b.puntaje - a.puntaje);
+            localStorage.setItem("rankingGlobal", JSON.stringify(rankingGlobal));
+            mostrarRankingGlobal();
+        }
+
+        function mostrarRankingGlobal() {
+            let rankingGlobal = JSON.parse(localStorage.getItem("rankingGlobal")) || [];
+            const div = document.getElementById("rankingGlobal");
+            div.innerHTML = rankingGlobal.map((j, i) => `<p>${i + 1}. ${j.nombre}: ${j.puntaje.toFixed(2)} USD</p>`).join("");
+        }
+
+        // Modal tutorial y nombre
+        function mostrarTutorial() {
+            document.getElementById("tutorialModal").style.display = "flex";
+        }
+
+        function iniciarJuego() {
+            const input = document.getElementById("nombreJugador").value.trim();
+            if (!input) {
+                alert("Por favor, ingresa tu nombre para continuar.");
+                return;
+            }
+            nombreJugador = input;
+            cerrarTutorial();
+            mostrarRankingGlobal();
+        }
+
+        function cerrarTutorial() {
+            document.getElementById("tutorialModal").style.display = "none";
+        }
+
+        window.onload = mostrarTutorial;
         setInterval(cambiarPrecios, 5000);
         actualizarTabla();
     </script>
 </body>
 </html>
-
